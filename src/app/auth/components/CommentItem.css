@@ -1,0 +1,212 @@
+.comment-item {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 12px;
+  transition: all 0.2s;
+}
+
+.comment-item:hover {
+  border-color: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.1);
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.comment-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.comment-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.comment-avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--violet), #ec4899);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.comment-author-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.comment-username {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.875rem;
+}
+
+.comment-date {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.comment-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.comment-action-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.comment-action-button:hover:not(:disabled) {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.2);
+}
+
+.comment-action-button.liked {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.3);
+  color: #22c55e;
+}
+
+.comment-action-button.disliked {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.comment-action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.comment-action-icon {
+  font-size: 0.875rem;
+}
+
+.comment-action-count {
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.comment-reply-button {
+  padding: 6px 16px;
+  background: rgba(124, 58, 237, 0.1);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: 20px;
+  color: var(--violet);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.comment-reply-button:hover {
+  background: rgba(124, 58, 237, 0.2);
+  border-color: rgba(124, 58, 237, 0.5);
+}
+
+.comment-content {
+  color: var(--text);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  margin-bottom: 16px;
+}
+
+.comment-reply-form {
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--card);
+  border-radius: 8px;
+}
+
+.comment-reply-textarea {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  color: var(--text);
+  font-size: 0.875rem;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.comment-reply-textarea:focus {
+  outline: none;
+  border-color: var(--violet);
+}
+
+.comment-reply-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.comment-reply-submit {
+  padding: 8px 20px;
+  background: linear-gradient(135deg, var(--violet), #5b21b6);
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.comment-reply-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+.comment-reply-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.comment-reply-cancel {
+  padding: 8px 20px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.comment-reply-cancel:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.2);
+}
+
+.comment-replies {
+  margin-top: 16px;
+  padding-left: 20px;
+  border-left: 2px solid rgba(255,255,255,0.05);
+}
