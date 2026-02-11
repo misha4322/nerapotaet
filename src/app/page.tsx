@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { headers } from "next/headers";
+import Image from "next/image"; // ✅ Импортируем Image
 import "./Home.css";
 
 type PostCard = {
@@ -46,7 +47,14 @@ export default async function Home() {
         <div className="nav-content">
           <div className="logo-wrapper">
             <div className="logo-icon">
-              <span>🎮</span>
+              <Image
+                src="/fox.png" // ✅ Добавляем картинку
+                alt="GameHub Logo"
+                width={32}
+                height={32}
+                className="logo-image"
+                priority // ✅ Приоритетная загрузка для логотипа
+              />
             </div>
             <div className="logo-text">GameHub</div>
           </div>
@@ -89,13 +97,23 @@ export default async function Home() {
               </div>
             </div>
           </div>
+          
           <div className="hero-panel">
             <div className="panel-container">
-              <div className="panel-badge">🔥</div>
+              <div className="panel-badge">
+                <Image
+                  src="/fox.png" // ✅ Добавляем иконку
+                  alt="GameHub"
+                  width={48}
+                  height={48}
+                  className="panel-badge-image"
+                />
+              </div>
               <div className="panel-header">
                 <h2 className="panel-title">Присоединяйся к нам</h2>
                 <p className="panel-subtitle">Стань частью сообщества</p>
               </div>
+              
               <div className="auth-options">
                 <Link href="/auth/login" className="auth-option auth-login">
                   <div className="option-title">Войти</div>
@@ -106,11 +124,48 @@ export default async function Home() {
                   <div className="option-subtitle">Создать новый аккаунт</div>
                 </Link>
               </div>
+              
               <div className="social-divider">Или через социальные сети</div>
+              
               <div className="social-buttons">
-                <button className="social-btn social-google">Google</button>
-                <button className="social-btn social-yandex">Яндекс</button>
-                <button className="social-btn social-steam">Steam</button>
+                <button className="social-btn social-google">
+                  <div className="social-icon-wrapper">
+                    <Image
+                      src="/google.png" // ✅ Добавляем Google иконку
+                      alt="Google"
+                      width={20}
+                      height={20}
+                      className="social-icon"
+                    />
+                  </div>
+                  <span>Google</span>
+                </button>
+                
+                <button className="social-btn social-yandex">
+                  <div className="social-icon-wrapper">
+                    <Image
+                      src="/yandex.png" // ✅ Добавляем Яндекс иконку
+                      alt="Yandex"
+                      width={20}
+                      height={20}
+                      className="social-icon"
+                    />
+                  </div>
+                  <span>Яндекс</span>
+                </button>
+                
+                <button className="social-btn social-steam">
+                  <div className="social-icon-wrapper">
+                    <Image
+                      src="/steam.png" // ✅ Добавляем Steam иконку
+                      alt="Steam"
+                      width={20}
+                      height={20}
+                      className="social-icon"
+                    />
+                  </div>
+                  <span>Steam</span>
+                </button>
               </div>
             </div>
           </div>

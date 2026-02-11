@@ -64,6 +64,7 @@
   align-items: center;
 }
 
+/* ✅ Обновленные стили для логотипа с Image */
 .logo-wrapper {
   display: flex;
   align-items: center;
@@ -79,6 +80,12 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.logo-image {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
 }
 
 .logo-text {
@@ -243,6 +250,7 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
+/* ✅ Обновленный стиль для бейджа с Image */
 .panel-badge {
   position: absolute;
   top: -20px;
@@ -257,6 +265,13 @@
   justify-content: center;
   box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
   animation: badgeFloat 4s ease-in-out infinite;
+}
+
+.panel-badge-image {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
 }
 
 .panel-header {
@@ -355,6 +370,76 @@
   right: 0;
 }
 
+/* ✅ НОВЫЕ СТИЛИ для социальных кнопок с Image */
+.social-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+  width: 100%;
+  border: 2px solid transparent;
+}
+
+.social-icon-wrapper {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.social-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.social-google {
+  background: linear-gradient(135deg, #4285F4 0%, #357AE8 100%);
+}
+
+.social-google:hover {
+  background: linear-gradient(135deg, #357AE8 0%, #2A65CC 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(66, 133, 244, 0.3);
+}
+
+.social-yandex {
+  background: linear-gradient(135deg, #FFCC00 0%, #FFAA00 100%);
+  color: #000;
+}
+
+.social-yandex:hover {
+  background: linear-gradient(135deg, #FFAA00 0%, #FF8800 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(255, 204, 0, 0.3);
+}
+
+.social-steam {
+  background: linear-gradient(135deg, #1b2838 0%, #2a475e 100%);
+}
+
+.social-steam:hover {
+  background: linear-gradient(135deg, #2a475e 0%, #1b2838 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(27, 40, 56, 0.3);
+}
+
 .features-section {
   margin-top: 100px;
 }
@@ -448,6 +533,7 @@
   text-decoration: none;
   font-weight: 600;
 }
+
 .latest-posts-link:hover {
   color: white;
 }
@@ -476,6 +562,7 @@
   color: white;
   transition: 0.2s;
 }
+
 .post-card:hover {
   transform: translateY(-2px);
   background: rgba(255,255,255,0.09);
@@ -580,8 +667,22 @@
     right: -15px;
   }
   
+  .panel-badge-image {
+    width: 36px;
+    height: 36px;
+  }
+  
   .latest-posts-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .social-buttons {
+    gap: 10px;
+  }
+  
+  .social-btn {
+    padding: 12px;
+    font-size: 14px;
   }
 }
 
@@ -606,5 +707,27 @@
   
   .glow-effect {
     display: none;
+  }
+  
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .logo-image {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .panel-badge {
+    width: 50px;
+    height: 50px;
+    top: -12px;
+    right: -12px;
+  }
+  
+  .panel-badge-image {
+    width: 30px;
+    height: 30px;
   }
 }

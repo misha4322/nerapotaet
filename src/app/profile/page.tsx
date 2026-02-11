@@ -1,7 +1,9 @@
+// app/profile/page.tsx
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import "./ProfilePage.css";
 
 export default async function ProfilePage() {
@@ -23,7 +25,20 @@ export default async function ProfilePage() {
         <div className="profile-card">
           <div className="profile-header">
             <div className="avatar">
-              {user?.name?.[0]?.toUpperCase() ?? "G"}
+              {user?.image ? (
+                <Image
+                  src={user.image}
+                  alt={user.name ?? "Avatar"}
+                  width={100}
+                  height={100}
+                  className="profile-avatar-img"
+                  style={{ borderRadius: '50%', objectFit: 'cover' }}
+                />
+              ) : (
+                <div className="avatar-placeholder">
+                  {user?.name?.[0]?.toUpperCase() ?? "G"}
+                </div>
+              )}
             </div>
             
             <div className="profile-info">
