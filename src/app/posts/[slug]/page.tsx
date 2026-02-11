@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { headers } from "next/headers";
-import Comments from "@/app/auth/components/Comments";
-
+import Comments from "@/app/auth/components/Comments"; 
 type Post = {
   id: string;
   slug: string;
@@ -69,12 +68,10 @@ export default async function PostPage(props: { params: Promise<{ slug: string }
           </div>
         ) : null}
 
-        <div className="post-content">
-          {post.content}
-        </div>
+        <div className="post-content">{post.content}</div>
 
-        {/* Комментарии */}
-        <Comments postId={post.id} />
+        
+        <Comments postSlug={slug} />
       </div>
     </div>
   );

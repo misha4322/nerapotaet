@@ -52,7 +52,7 @@ export async function GET(req: Request, { params }: { params: { postId: string }
   list.forEach(c => {
     map.set(c.id, {
       ...c,
-      createdAt: c.createdAt.toISOString(),
+     createdAt: c.createdAt ? c.createdAt.toISOString() : null,
       author: { id: c.author.id, username: c.author.username, avatarUrl: c.author.avatarUrl },
       likeCount: countMap.get(c.id) || 0,
       likedByMe: myLikeSet.has(c.id),

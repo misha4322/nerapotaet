@@ -102,30 +102,14 @@ export const postLikes = pgTable("post_likes", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
 
-export const commentLikes = pgTable(
-  "comment_likes",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-
-    commentId: uuid("comment_id")
-      .references(() => comments.id, { onDelete: "cascade" })
-      .notNull(),
-
-    userId: uuid("user_id")
-      .references(() => users.id, { onDelete: "cascade" })
-      .notNull(),
-
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-  },
-  (t) => ({
-    commentUserUnique: uniqueIndex("comment_likes_comment_user_unique").on(
-      t.commentId,
-      t.userId
-    ),
-  })
-);
+export const commentLikes = pgTable("comment_likes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  commentId: uuid("comment_id").references(() => comments.id, { onDelete: "cascade" }).notNull(),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  // ВОТ ЭТОЙ СТРОЧКИ У ТЕБЯ СКОРЕЕ ВСЕГО НЕТ:
+  type: text("type").$type<"like" | "dislike">().notNull(), 
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
 
 export const tags = pgTable("tags", {
   id: uuid("id").defaultRandom().primaryKey(),
