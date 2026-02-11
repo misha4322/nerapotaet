@@ -15,7 +15,7 @@
     "drizzle-orm": "^0.45.1",
     "elysia": "^1.4.22",
     "lucide-react": "^0.563.0",
-    "next": "16.1.4",
+    "next": "^15.5.12",
     "next-auth": "^4.24.13",
     "next-auth-steam": "^0.4.0",
     "postgres": "^3.4.8",
@@ -30,7 +30,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.1.4",
+    "eslint-config-next": "^15.5.12",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
