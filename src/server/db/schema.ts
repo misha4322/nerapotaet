@@ -15,38 +15,17 @@ export const users = pgTable(
   "users",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-
-    username: varchar("username", { length: 32 })
-      .notNull()
-      .unique(),
-
-    // ✅ Steam не даёт email => email nullable
+    username: varchar("username", { length: 32 }).notNull().unique(),
     email: varchar("email", { length: 255 }).unique(),
-
     passwordHash: varchar("password_hash", { length: 255 }),
-
-    provider: varchar("provider", { length: 20 })
-      .notNull()
-      .default("local"),
-
+    provider: varchar("provider", { length: 20 }).notNull().default("local"),
     providerId: varchar("provider_id", { length: 255 }),
-
-    role: varchar("role", { length: 20 })
-      .notNull()
-      .default("user"),
-
+    role: varchar("role", { length: 20 }).notNull().default("user"),
     avatarUrl: text("avatar_url"),
-
-    isBanned: boolean("is_banned")
-      .notNull()
-      .default(false),
-
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    isBanned: boolean("is_banned").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({
-    // ✅ Чтобы Steam/OAuth не создавали дубликаты
     providerProviderIdUnique: uniqueIndex("users_provider_providerid_unique").on(
       t.provider,
       t.providerId
@@ -86,7 +65,7 @@ export const comments = pgTable("comments", {
   authorId: uuid("author_id")
     .references(() => users.id)
     .notNull(),
-  parentId: uuid("parent_id").references((): any => comments.id), // Самоцитирование для подкомментов
+  parentId: uuid("parent_id").references((): any => comments.id),
   content: text("content").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
@@ -101,42 +80,53 @@ export const postLikes = pgTable(
     userId: uuid("user_id")
       .references(() => users.id, { onDelete: "cascade" })
       .notNull(),
-
-    // ✅ добавили тип реакции
     type: text("type").$type<"like" | "dislike">().notNull().default("like"),
-
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   },
   (t) => ({
-    // ✅ один пользователь = одна реакция на пост
     postUserUnique: uniqueIndex("post_likes_post_user_unique").on(t.postId, t.userId),
   })
 );
-export const commentLikes = pgTable("comment_likes", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  commentId: uuid("comment_id").references(() => comments.id, { onDelete: "cascade" }).notNull(),
-  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
-  // ВОТ ЭТОЙ СТРОЧКИ У ТЕБЯ СКОРЕЕ ВСЕГО НЕТ:
-  type: text("type").$type<"like" | "dislike">().notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+
+export const commentLikes = pgTable(
+  "comment_likes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    commentId: uuid("comment_id")
+      .references(() => comments.id, { onDelete: "cascade" })
+      .notNull(),
+    userId: uuid("user_id")
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
+    type: text("type").$type<"like" | "dislike">().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    commentUserUnique: uniqueIndex("comment_likes_comment_user_unique").on(t.commentId, t.userId),
+  })
+);
 
 export const tags = pgTable("tags", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: varchar("name", { length: 50 }).notNull().unique(),
 });
 
+export const postTags = pgTable(
+  "post_tags",
+  {
+    postId: uuid("post_id")
+      .references(() => posts.id, { onDelete: "cascade" })
+      .notNull(),
+    tagId: uuid("tag_id")
+      .references(() => tags.id, { onDelete: "cascade" })
+      .notNull(),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.postId, t.tagId] }),
+  })
+);
 
-export const postTags = pgTable("post_tags", {
-  postId: uuid("post_id")
-    .references(() => posts.id, { onDelete: "cascade" })
-    .notNull(),
-  tagId: uuid("tag_id")
-    .references(() => tags.id, { onDelete: "cascade" })
-    .notNull(),
-}, (t) => ({
-  pk: primaryKey({ columns: [t.postId, t.tagId] }),
-}));
+// Relations
 export const usersRelations = relations(users, ({ many }) => ({
   posts: many(posts),
   comments: many(comments),

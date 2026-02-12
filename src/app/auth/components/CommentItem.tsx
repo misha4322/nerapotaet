@@ -26,9 +26,9 @@ export type CommentNode = {
 
 interface CommentItemProps {
   comment: CommentNode;
-  postId: string;              // ← slug поста
-  onUpdate: () => void;        // обновить список комментариев
-  onReaction: (commentId: string, type: "like" | "dislike") => void;
+  postId: string;
+  onUpdate: () => void;
+  onReaction: (commentId: string, type: "like" | "dislike") => Promise<void>;
 }
 
 export default function CommentItem({
@@ -42,7 +42,6 @@ export default function CommentItem({
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
 
-  // ===== ВРЕМЯ =====
   const timeAgo = comment.createdAt
     ? formatDistanceToNow(new Date(comment.createdAt), {
         addSuffix: true,
@@ -50,7 +49,6 @@ export default function CommentItem({
       })
     : "недавно";
 
-  // ===== ОТПРАВКА ОТВЕТА =====
   async function submitReply() {
     const content = replyText.trim();
     if (!content) return;
@@ -67,21 +65,17 @@ export default function CommentItem({
       const res = await fetch(`/api/posts/${postId}/comments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          content,
-          parentId: comment.id,
-        }),
+        body: JSON.stringify({ content, parentId: comment.id }),
       });
 
       const data = await res.json().catch(() => ({}));
-
       if (!res.ok) {
         throw new Error(data.error || "Ошибка отправки");
       }
 
       setReplyText("");
       setIsReplying(false);
-      onUpdate(); // перезагрузка комментариев
+      onUpdate();
     } catch (err: any) {
       setError(err.message || "Ошибка сети");
     } finally {
@@ -89,10 +83,8 @@ export default function CommentItem({
     }
   }
 
-  // ===== UI =====
   return (
     <div className="comment-item">
-      {/* ===== HEADER ===== */}
       <div className="comment-header">
         <div className="comment-author">
           {comment.author.avatarUrl ? (
@@ -116,17 +108,12 @@ export default function CommentItem({
         </div>
       </div>
 
-      {/* ===== CONTENT ===== */}
       <div className="comment-content">{comment.content}</div>
 
-      {/* ===== ACTIONS ===== */}
       <div className="comment-actions">
-        {/* ЛАЙК */}
         <button
           type="button"
-          className={`comment-action-button ${
-            comment.likedByMe ? "liked" : ""
-          }`}
+          className={`comment-action-button ${comment.likedByMe ? "liked" : ""}`}
           onClick={() => onReaction(comment.id, "like")}
         >
           <span className="comment-action-icon">👍</span>
@@ -135,23 +122,17 @@ export default function CommentItem({
           )}
         </button>
 
-        {/* ДИЗЛАЙК */}
         <button
           type="button"
-          className={`comment-action-button ${
-            comment.dislikedByMe ? "disliked" : ""
-          }`}
+          className={`comment-action-button ${comment.dislikedByMe ? "disliked" : ""}`}
           onClick={() => onReaction(comment.id, "dislike")}
         >
           <span className="comment-action-icon">👎</span>
           {comment.dislikeCount > 0 && (
-            <span className="comment-action-count">
-              {comment.dislikeCount}
-            </span>
+            <span className="comment-action-count">{comment.dislikeCount}</span>
           )}
         </button>
 
-        {/* ОТВЕТ */}
         <button
           type="button"
           className="comment-reply-button"
@@ -161,7 +142,6 @@ export default function CommentItem({
         </button>
       </div>
 
-      {/* ===== ФОРМА ОТВЕТА ===== */}
       {isReplying && (
         <div className="comment-reply-form">
           <textarea
@@ -175,10 +155,7 @@ export default function CommentItem({
           />
 
           {error && (
-            <div
-              className="comments-error"
-              style={{ color: "red", fontSize: "12px" }}
-            >
+            <div style={{ color: "red", fontSize: "12px", marginBottom: "8px" }}>
               {error}
             </div>
           )}
@@ -207,12 +184,8 @@ export default function CommentItem({
         </div>
       )}
 
-      {/* ===== REPLIES ===== */}
       {comment.replies?.length > 0 && (
-        <div
-          className="comment-replies"
-          style={{ marginLeft: "20px", borderLeft: "1px solid #ddd" }}
-        >
+        <div className="comment-replies">
           {comment.replies.map((reply) => (
             <CommentItem
               key={reply.id}

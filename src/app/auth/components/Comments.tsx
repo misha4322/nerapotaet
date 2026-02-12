@@ -1,28 +1,8 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import CommentItem from "./CommentItem";
+import CommentItem, { CommentNode } from "./CommentItem";
 import "./Comments.css";
-
-type Author = {
-  id: string;
-  username: string;
-  avatarUrl: string | null;
-};
-
-type CommentNode = {
-  id: string;
-  postId: string;
-  parentId: string | null;
-  content: string;
-  createdAt: string | null; // ✅ может быть null
-  author: Author;
-  likeCount: number;
-  dislikeCount?: number;      // (если есть на бэке — можно убрать ?)
-  likedByMe: boolean;
-  dislikedByMe?: boolean;     // (если есть на бэке — можно убрать ?)
-  replies: CommentNode[];
-};
 
 export default function Comments({ postSlug }: { postSlug: string }) {
   const [comments, setComments] = useState<CommentNode[]>([]);
@@ -33,9 +13,8 @@ export default function Comments({ postSlug }: { postSlug: string }) {
 
   const url = `/api/posts/${encodeURIComponent(postSlug)}/comments`;
 
-  // ✅ Загружаем комментарии только когда postSlug валидный
   const loadComments = useCallback(async () => {
-    if (!postSlug || postSlug === "undefined") {
+    if (!postSlug) {
       console.warn("Comments: postSlug is undefined");
       setLoading(false);
       return;
@@ -44,13 +23,8 @@ export default function Comments({ postSlug }: { postSlug: string }) {
     try {
       setLoading(true);
       setError("");
-
       const res = await fetch(url);
-
-      if (!res.ok) {
-        throw new Error(`Failed to load comments: ${res.status}`);
-      }
-
+      if (!res.ok) throw new Error(`Failed to load comments: ${res.status}`);
       const data = await res.json();
       setComments(data.comments || []);
     } catch (err) {
@@ -65,15 +39,13 @@ export default function Comments({ postSlug }: { postSlug: string }) {
     loadComments();
   }, [loadComments]);
 
-  // ✅ Отправка комментария
   async function addComment(parentId: string | null = null) {
     const content = text.trim();
     if (!content) {
       setError("Комментарий не может быть пустым");
       return;
     }
-
-    if (!postSlug || postSlug === "undefined") {
+    if (!postSlug) {
       setError("Ошибка: slug поста не определён");
       return;
     }
@@ -87,12 +59,10 @@ export default function Comments({ postSlug }: { postSlug: string }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content, parentId }),
       });
-
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || "Не удалось отправить комментарий");
       }
-
       setText("");
       await loadComments();
     } catch (err: any) {
@@ -102,29 +72,26 @@ export default function Comments({ postSlug }: { postSlug: string }) {
     }
   }
 
-  // ✅ Лайк
-  async function handleLike(commentId: string) {
+  const handleReaction = async (commentId: string, type: "like" | "dislike") => {
     try {
       const res = await fetch(`/api/comments/${commentId}/reaction`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type }),
       });
-
       if (res.ok) {
         await loadComments();
       }
     } catch (err) {
-      console.error("Like error:", err);
+      console.error("Reaction error:", err);
     }
-  }
+  };
 
-  // ✅ Состояния загрузки и ошибок
-  if (!postSlug || postSlug === "undefined") {
+  if (!postSlug) {
     return (
       <div className="comments-container">
         <h2 className="comments-title">Комментарии</h2>
-        <div className="comments-error">
-          Ошибка загрузки: slug поста не определён
-        </div>
+        <div className="comments-error">Ошибка загрузки: slug поста не определён</div>
       </div>
     );
   }
@@ -173,9 +140,9 @@ export default function Comments({ postSlug }: { postSlug: string }) {
             <CommentItem
               key={comment.id}
               comment={comment}
-              postId={postSlug} 
+              postId={postSlug}
               onUpdate={loadComments}
-              onLike={handleLike}
+              onReaction={handleReaction}
             />
           ))}
         </div>

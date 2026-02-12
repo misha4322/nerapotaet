@@ -1,4 +1,3 @@
-// app/profile/page.tsx
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
@@ -32,7 +31,8 @@ export default async function ProfilePage() {
                   width={100}
                   height={100}
                   className="profile-avatar-img"
-                  style={{ borderRadius: '50%', objectFit: 'cover' }}
+                  style={{ borderRadius: "50%", objectFit: "cover" }}
+                  priority // ✅ добавлено для LCP
                 />
               ) : (
                 <div className="avatar-placeholder">
@@ -40,11 +40,9 @@ export default async function ProfilePage() {
                 </div>
               )}
             </div>
-            
+
             <div className="profile-info">
-              <h1 className="profile-name">
-                {user?.name ?? "Геймер"}
-              </h1>
+              <h1 className="profile-name">{user?.name ?? "Геймер"}</h1>
               <p className="profile-email">{user?.email}</p>
               <div className="profile-badge">Участник GameHub</div>
             </div>
@@ -55,17 +53,14 @@ export default async function ProfilePage() {
               <div className="stat-value">0</div>
               <div className="stat-label">Игр в библиотеке</div>
             </div>
-            
             <div className="stat-card">
               <div className="stat-value">0</div>
               <div className="stat-label">Достижений</div>
             </div>
-            
             <div className="stat-card">
               <div className="stat-value">0</div>
               <div className="stat-label">Друзей</div>
             </div>
-            
             <div className="stat-card">
               <div className="stat-value">0</div>
               <div className="stat-label">Часов в играх</div>
@@ -76,19 +71,13 @@ export default async function ProfilePage() {
             <Link href="/games" className="action-btn action-primary">
               🎮 Перейти к играм
             </Link>
-            
             <Link href="/community" className="action-btn action-secondary">
               👥 Сообщество
             </Link>
-            
             <Link href="/settings" className="action-btn action-tertiary">
               ⚙️ Настройки
             </Link>
-            
-            <Link
-              href="/api/auth/signout"
-              className="logout-btn"
-            >
+            <Link href="/api/auth/signout" className="logout-btn">
               🚪 Выйти из аккаунта
             </Link>
           </div>

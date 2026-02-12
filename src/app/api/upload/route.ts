@@ -21,32 +21,43 @@ export async function POST(req: Request) {
     }
 
     const form = await req.formData();
-    const file = form.get("file");
+    // Поддержка одного файла (ключ "file") и множества (ключ "files[]")
+    const files: File[] = [];
 
-    if (!(file instanceof File)) {
-      return NextResponse.json({ error: "file is required" }, { status: 400 });
+    const singleFile = form.get("file");
+    if (singleFile instanceof File) files.push(singleFile);
+
+    const multipleFiles = form.getAll("files[]");
+    multipleFiles.forEach((item) => {
+      if (item instanceof File) files.push(item);
+    });
+
+    if (files.length === 0) {
+      return NextResponse.json({ error: "No files uploaded" }, { status: 400 });
     }
 
-    if (!file.type.startsWith("image/")) {
-      return NextResponse.json({ error: "Only images allowed" }, { status: 400 });
+    const maxBytes = 5 * 1024 * 1024; // 5MB
+    const uploadedUrls: string[] = [];
+
+    for (const file of files) {
+      if (!file.type.startsWith("image/")) {
+        return NextResponse.json({ error: "Only images allowed" }, { status: 400 });
+      }
+      if (file.size > maxBytes) {
+        return NextResponse.json({ error: "File too large (max 5MB)" }, { status: 400 });
+      }
+
+      const bytes = Buffer.from(await file.arrayBuffer());
+      const ext = safeExt(file.name);
+      const name = `${crypto.randomUUID()}${ext}`;
+      const uploadDir = path.join(process.cwd(), "public", "uploads");
+      await mkdir(uploadDir, { recursive: true });
+      const fullPath = path.join(uploadDir, name);
+      await writeFile(fullPath, bytes);
+      uploadedUrls.push(`/uploads/${name}`);
     }
 
-    const maxBytes = 5 * 1024 * 1024;
-    if (file.size > maxBytes) {
-      return NextResponse.json({ error: "File too large (max 5MB)" }, { status: 400 });
-    }
-
-    const bytes = Buffer.from(await file.arrayBuffer());
-    const ext = safeExt(file.name);
-    const name = `${crypto.randomUUID()}${ext}`;
-
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-    await mkdir(uploadDir, { recursive: true });
-
-    const fullPath = path.join(uploadDir, name);
-    await writeFile(fullPath, bytes);
-
-    return NextResponse.json({ url: `/uploads/${name}` });
+    return NextResponse.json({ urls: uploadedUrls });
   } catch (e) {
     console.error("POST /api/upload error:", e);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
