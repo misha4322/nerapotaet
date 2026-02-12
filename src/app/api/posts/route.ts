@@ -22,7 +22,6 @@ async function makeUniqueSlug(title: string) {
   }
 }
 
-// GET /api/posts — список всех постов
 export async function GET() {
   try {
     const list = await db.query.posts.findMany({
@@ -41,6 +40,7 @@ export async function GET() {
         slug: p.slug,
         title: p.title,
         content: p.content,
+        coverImage: p.coverImage ?? null, // ✅ добавлено
         createdAt: p.createdAt?.toISOString?.() ?? p.createdAt,
         author: {
           id: p.author.id,
@@ -62,7 +62,6 @@ export async function GET() {
   }
 }
 
-// POST /api/posts — создание поста
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -86,6 +85,7 @@ export async function POST(req: Request) {
       ? body.tagIds.map(String)
       : [];
     const isPublished = body.isPublished === false ? false : true;
+    const coverImage = body.coverImage ? String(body.coverImage) : null; // ✅ добавлено
 
     if (!title || !content) {
       return NextResponse.json(
@@ -105,6 +105,7 @@ export async function POST(req: Request) {
         authorId: userId,
         categoryId,
         isPublished,
+        coverImage, // ✅ добавлено
       })
       .returning();
 

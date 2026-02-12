@@ -7,7 +7,7 @@ import {
   boolean,
   integer,
   primaryKey,
-  uniqueIndex, 
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -91,23 +91,33 @@ export const comments = pgTable("comments", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
 
-export const postLikes = pgTable("post_likes", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  postId: uuid("post_id")
-    .references(() => posts.id, { onDelete: "cascade" })
-    .notNull(),
-  userId: uuid("user_id")
-    .references(() => users.id, { onDelete: "cascade" })
-    .notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
-});
+export const postLikes = pgTable(
+  "post_likes",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    postId: uuid("post_id")
+      .references(() => posts.id, { onDelete: "cascade" })
+      .notNull(),
+    userId: uuid("user_id")
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
 
+    // ✅ добавили тип реакции
+    type: text("type").$type<"like" | "dislike">().notNull().default("like"),
+
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  },
+  (t) => ({
+    // ✅ один пользователь = одна реакция на пост
+    postUserUnique: uniqueIndex("post_likes_post_user_unique").on(t.postId, t.userId),
+  })
+);
 export const commentLikes = pgTable("comment_likes", {
   id: uuid("id").primaryKey().defaultRandom(),
   commentId: uuid("comment_id").references(() => comments.id, { onDelete: "cascade" }).notNull(),
   userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
   // ВОТ ЭТОЙ СТРОЧКИ У ТЕБЯ СКОРЕЕ ВСЕГО НЕТ:
-  type: text("type").$type<"like" | "dislike">().notNull(), 
+  type: text("type").$type<"like" | "dislike">().notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -125,7 +135,7 @@ export const postTags = pgTable("post_tags", {
     .references(() => tags.id, { onDelete: "cascade" })
     .notNull(),
 }, (t) => ({
-  pk: primaryKey({ columns: [t.postId, t.tagId] }), 
+  pk: primaryKey({ columns: [t.postId, t.tagId] }),
 }));
 export const usersRelations = relations(users, ({ many }) => ({
   posts: many(posts),

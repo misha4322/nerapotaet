@@ -18,13 +18,32 @@ export default function PostEditor({
   const [content, setContent] = useState("");
   const [categoryId, setCategoryId] = useState<string>("");
   const [tagIds, setTagIds] = useState<string[]>([]);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [coverUrl, setCoverUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
 
-  const canSubmit = useMemo(() => title.trim() && content.trim(), [title, content]);
+  const canSubmit = useMemo(
+    () => title.trim() && content.trim(),
+    [title, content]
+  );
 
   function toggleTag(id: string) {
-    setTagIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+    setTagIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  }
+
+  async function uploadCover(file: File) {
+    const fd = new FormData();
+    fd.append("file", file);
+    const res = await fetch("/api/upload", {
+      method: "POST",
+      body: fd,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Upload failed");
+    return String(data.url);
   }
 
   async function submit() {
@@ -33,15 +52,22 @@ export default function PostEditor({
 
     setIsLoading(true);
     try {
+      let uploadedCover: string | null = null;
+      if (coverFile) {
+        uploadedCover = await uploadCover(coverFile);
+        setCoverUrl(uploadedCover);
+      }
+
       const res = await fetch("/api/posts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title,
           content,
-          categoryId: categoryId || null, // игра
-          tagIds, // темы
+          categoryId: categoryId || null,
+          tagIds,
           isPublished: true,
+          coverImage: uploadedCover,
         }),
       });
 
@@ -54,8 +80,8 @@ export default function PostEditor({
 
       router.push(`/posts/${data.post.slug}`);
       router.refresh();
-    } catch {
-      setError("Сетевая ошибка");
+    } catch (err: any) {
+      setError(err.message || "Сетевая ошибка");
     } finally {
       setIsLoading(false);
     }
@@ -64,7 +90,9 @@ export default function PostEditor({
   return (
     <div className="space-y-5">
       {error ? (
-        <div className="p-3 rounded-lg bg-red-500/20 border border-red-500/40">{error}</div>
+        <div className="p-3 rounded-lg bg-red-500/20 border border-red-500/40">
+          {error}
+        </div>
       ) : null}
 
       <div>
@@ -105,7 +133,9 @@ export default function PostEditor({
                 onClick={() => toggleTag(t.id)}
                 className={[
                   "text-xs px-3 py-2 rounded-xl border transition",
-                  active ? "bg-violet-600 border-violet-500" : "bg-white/5 border-white/10 hover:bg-white/10",
+                  active
+                    ? "bg-violet-600 border-violet-500"
+                    : "bg-white/5 border-white/10 hover:bg-white/10",
                 ].join(" ")}
               >
                 #{t.name}
@@ -113,6 +143,24 @@ export default function PostEditor({
             );
           })}
         </div>
+      </div>
+
+      <div>
+        <label className="text-sm text-gray-300">Обложка (картинка)</label>
+        <input
+          type="file"
+          accept="image/*"
+          className="mt-2 block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-600 file:text-white hover:file:bg-violet-700"
+          onChange={(e) => setCoverFile(e.target.files?.[0] ?? null)}
+        />
+        {coverUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={coverUrl}
+            alt="Предпросмотр обложки"
+            className="mt-3 rounded-xl max-h-64 object-cover border border-white/10"
+          />
+        )}
       </div>
 
       <div>

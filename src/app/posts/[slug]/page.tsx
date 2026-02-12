@@ -1,15 +1,22 @@
 import Link from "next/link";
 import { headers } from "next/headers";
-import Comments from "@/app/auth/components/Comments"; 
+import Comments from "@/app/auth/components/Comments";
+import PostReactions from "@/app/auth/components/PostReactions";
+
 type Post = {
   id: string;
   slug: string;
   title: string;
   content: string;
-  createdAt: string;
+  createdAt: string | null;
+  coverImage: string | null;
   author: { id: string; username: string; avatarUrl: string | null };
   category: { id: string; title: string } | null;
   tags: { id: string; name: string }[];
+  likeCount: number;
+  dislikeCount: number;
+  likedByMe: boolean;
+  dislikedByMe: boolean;
 };
 
 async function getBaseUrl() {
@@ -35,7 +42,9 @@ async function getPost(slug: string): Promise<Post> {
   return data.post as Post;
 }
 
-export default async function PostPage(props: { params: Promise<{ slug: string }> }) {
+export default async function PostPage(props: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await props.params;
   const post = await getPost(slug);
 
@@ -68,9 +77,25 @@ export default async function PostPage(props: { params: Promise<{ slug: string }
           </div>
         ) : null}
 
+        {post.coverImage && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={post.coverImage}
+            alt="Обложка поста"
+            className="mt-4 rounded-2xl w-full max-h-[420px] object-cover border border-white/10"
+          />
+        )}
+
         <div className="post-content">{post.content}</div>
 
-        
+        <PostReactions
+          slug={slug}
+          likeCount={post.likeCount}
+          dislikeCount={post.dislikeCount}
+          likedByMe={post.likedByMe}
+          dislikedByMe={post.dislikedByMe}
+        />
+
         <Comments postSlug={slug} />
       </div>
     </div>
